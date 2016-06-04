@@ -1,73 +1,81 @@
 package com.abc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class Account {
+/**
+ * Account class
+ */
+public class Account
+{
+    // Account Id generator.
+    public static final AtomicInteger idCounter = new AtomicInteger(0);
+    private final int id;   // account integer id
+    private final AccountType type; // account type
+    private final List<Transaction> transactions;   // account types
 
-    public static final int CHECKING = 0;
-    public static final int SAVINGS = 1;
-    public static final int MAXI_SAVINGS = 2;
+    public Account(AccountType type)
+    {
+        // Each new account gets unique incremental id.
+        this(idCounter.getAndIncrement(), type);
+    }
 
-    private final int accountType;
-    public List<Transaction> transactions;
-
-    public Account(int accountType) {
-        this.accountType = accountType;
+    private Account(int id, AccountType type)
+    {
+        this.id = id;
+        this.type = type;
         this.transactions = new ArrayList<Transaction>();
     }
 
-    public void deposit(double amount) {
+    public int id() { return id; }
+    public AccountType type() { return type; }
+
+    // Return immutable Transactions list.
+    public List<Transaction> transactions() { return Collections.unmodifiableList(this.transactions); }
+
+    /**
+     * Deposit new amount. Creates deposit transaction, Intentionally implemented as blocking call.
+     * @param amount: amount to deposit.
+     */
+    public void deposit(double amount)
+    {
         if (amount <= 0) {
-            throw new IllegalArgumentException("amount must be greater than zero");
-        } else {
-            transactions.add(new Transaction(amount));
+            throw new IllegalArgumentException("Deposit Amount must be greater than zero");
+        }
+        else {
+            synchronized (this) {
+                transactions.add(new Transaction(amount, Transaction.TransactionType.DEPOSIT));
+            }
         }
     }
 
-public void withdraw(double amount) {
-    if (amount <= 0) {
-        throw new IllegalArgumentException("amount must be greater than zero");
-    } else {
-        transactions.add(new Transaction(-amount));
+    /**
+     * Withdraw new amount. Creates withdraw transaction, Intentionally implemented as blocking call.
+     * @param amount: amount to withdraw.
+     */
+    public void withdraw(double amount)
+    {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Withdrawal Amount must be greater than zero");
+        }
+        else {
+            synchronized (this) {
+                transactions.add(new Transaction(-amount, Transaction.TransactionType.WITHDRAWAL));
+            }
+        }
     }
-}
 
-    public double interestEarned() {
+    public double interestEarned()
+    {
         double amount = sumTransactions();
-        switch(accountType){
-            case SAVINGS:
-                if (amount <= 1000)
-                    return amount * 0.001;
-                else
-                    return 1 + (amount-1000) * 0.002;
-//            case SUPER_SAVINGS:
-//                if (amount <= 4000)
-//                    return 20;
-            case MAXI_SAVINGS:
-                if (amount <= 1000)
-                    return amount * 0.02;
-                if (amount <= 2000)
-                    return 20 + (amount-1000) * 0.05;
-                return 70 + (amount-2000) * 0.1;
-            default:
-                return amount * 0.001;
-        }
+        return this.type.calculate(amount);
     }
 
-    public double sumTransactions() {
-       return checkIfTransactionsExist(true);
-    }
-
-    private double checkIfTransactionsExist(boolean checkAll) {
-        double amount = 0.0;
-        for (Transaction t: transactions)
-            amount += t.amount;
-        return amount;
-    }
-
-    public int getAccountType() {
-        return accountType;
+    public double sumTransactions()
+    {
+        return transactions.stream().mapToDouble(t -> t.amount()).sum();
     }
 
 }

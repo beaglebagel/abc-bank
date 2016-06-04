@@ -2,6 +2,11 @@ package com.abc;
 
 /**
  * AccountType Enum incorporates the account type name and concrete interest calculator.
+ * The Calculator instances(static) are placed as part of AccountType as the calculator requirement
+ * is fairly simple. As more requirement comes(e.g, Interchangeable accurred interest period etc..),
+ * it might become appropriate to break it out of the AccountType. Further, it could be separated as
+ * standalone components or become part of Account hierarchy when AccountTypes requirement grows.
+ * (That is .. building out Account class hierarchy instead).
  */
 public enum AccountType
 {
@@ -28,6 +33,7 @@ public enum AccountType
      */
     private interface InterestCalculator
     {
+
         /**
          * There is no assumption about positivity of the amount (>0) as transactions within an account
          * could result in negative balance(temporarily) by design. Indeed real Banks do allow this.
