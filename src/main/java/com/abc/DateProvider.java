@@ -14,5 +14,5 @@ public class DateProvider
 
     public static DateProvider getInstance() { return instance; }
 
-    public static LocalDateTime now() { return LocalDateTime.now(); }
+    public LocalDateTime now() { return LocalDateTime.now(); }
 }
