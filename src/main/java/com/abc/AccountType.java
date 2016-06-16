@@ -2,11 +2,11 @@ package com.abc;
 
 /**
  * AccountType Enum incorporates the account type name and concrete interest calculator.
- * The Calculator instances(static) are placed as part of AccountType as the calculator requirement
- * is fairly simple. As more requirement comes(e.g, Interchangeable accurred interest period etc..),
- * it might become appropriate to break it out of the AccountType. Further, it could be separated as
- * standalone components or become part of Account hierarchy when AccountTypes requirement grows.
- * (That is .. building out Account class hierarchy instead).
+ * The Calculator instances(static) are placed within AccountType as the calculator requirement
+ * is fairly simple. If more requirement comes(e.g, Adjustable accrued interest period etc..),
+ * it might become more suitable to break it out of the AccountType.
+ * For example, it could be broken out as standalone component or be part of Account class hierarchy as AccountType requirement grows.
+ * (Account super class -> Checking, Savings, Maxi Savings sub class).
  */
 public enum AccountType
 {
@@ -41,15 +41,17 @@ public enum AccountType
          * @param amount: Amount to calculate interest on.
          * @return: interest amount
          */
+        public static final int DAILY_ACCURUAL = 365;
         public double interest(double amount);
     }
 
     /** Daily accrued interest rate 0.1% */
     private static class CheckingInterestCalculator implements InterestCalculator
     {
-        public double interest(double amount) {
+        public double interest(double amount)
+        {
             if(amount <= 0) { return 0; }
-            return amount * 0.001 / 365;
+            return amount * 0.001 / DAILY_ACCURUAL;
         }
     }
 
@@ -59,8 +61,8 @@ public enum AccountType
         public double interest(double amount)
         {
             if(amount <= 0) { return 0; }
-            if(amount <= 1000) { return amount * 0.001 / 365; }
-            return (1 + (amount - 1000) * 0.002) / 365;
+            if(amount <= 1000) { return amount * 0.001 / DAILY_ACCURUAL; }
+            return (1 + (amount - 1000) * 0.002) / DAILY_ACCURUAL;
         }
     }
 
@@ -70,10 +72,9 @@ public enum AccountType
         public double interest(double amount)
         {
             if(amount <= 0) { return 0; }
-            if(amount <= 1000) { return amount * 0.02 / 365; }
-            if(amount <= 2000) { return (20 + (amount-1000) * 0.05) / 365; }
-            return (20 + 50 + (amount - 2000) * 0.1) / 365;
+            if(amount <= 1000) { return amount * 0.02 / DAILY_ACCURUAL; }
+            if(amount <= 2000) { return (20 + (amount-1000) * 0.05) / DAILY_ACCURUAL; }
+            return (20 + 50 + (amount - 2000) * 0.1) / DAILY_ACCURUAL;
         }
     }
 }
-

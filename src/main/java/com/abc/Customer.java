@@ -33,12 +33,12 @@ public class Customer
     public int numAccounts() { return accounts.size(); }
 
     /**
-     * Transfer affects from/to Account's underlying transactions which can potentially be modified concurrently.
-     * In order prevent race conditions / potential deadlock, acquisition of the lock on both accounts are necessary.
+     * Transfer operation can potentially affect Account(From/To)'s inner transactions concurrently.
+     * In order prevent race conditions / possible deadlock, lock acquisition on both accounts are necessary prior to actual transfer.
      * This is intentionally implemented as a blocking call.
      * Since this method assumes caller has access to the Account objects,
      * exposing available account list through id -> Account map might become appropriate in the future.
-     * which will transform the parameters types to Account ids instead of Account references.
+     * This will transform the parameters types to Account integer ids instead of Account references.
      *
      * @param from : Account to withdraw money from.
      * @param to : Account to deposit money into.
@@ -57,7 +57,7 @@ public class Customer
         }
 
         // Attempt to acquire locks on accounts in order of ascending id,
-        // this is a basic way to prevent potential deadlock among accounts.
+        // this is one of a basic way to prevent potential deadlock among operations on accounts.
         synchronized (firstAcquire)
         {
             synchronized (secondAcquire)

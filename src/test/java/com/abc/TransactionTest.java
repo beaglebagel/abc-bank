@@ -27,7 +27,8 @@ public class TransactionTest
         assertEquals("Withdrawal", t2.type().toString());
 
         // Skipping the transaction's datetime test for now as Java 8 requires fixed Clock instance
-        // into Time api's constructor in order to properly test Time functionality, this affects constructor design.
+        // into Time api's constructor in order to properly test Time functionality,
+        // This affects constructor design and am skipping now as it's minor for now.
     }
 
 }
